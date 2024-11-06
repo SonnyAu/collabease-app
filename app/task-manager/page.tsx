@@ -53,7 +53,7 @@ export default function TaskManager() {
 
   return (
     <>
-      <div className="jumbotron jumbotron-fluid">
+      <div className="jumbotron jumbotron-fluid ">
         <div className="container">
           <h1 className="display-4">Task Manager Dashboard</h1>
           <p className="lead">
@@ -63,7 +63,7 @@ export default function TaskManager() {
         </div>
       </div>
 
-      <div className="flex-none w-[100vw] h-screen bg-gray-100 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
+      <div className="flex-none w-[100vw] h-screen bg-gradient-to-r from-sky-500 to-indigo-500 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
         <div className="bg-white w-[60vw] mx-auto mt-25 mb-auto pt-10 px-8 pb-10 rounded-xl flex-col">
           <h2 className="text-gray-400 mb-4 text-left">To-Do List</h2>
           <div className="w-[40vw] rounded-3xl bg-slate-200 text-left pl-4 justify-between items-center flex">
@@ -76,7 +76,7 @@ export default function TaskManager() {
             />
             <button
               onClick={addTask} // Call addTask directly
-              className="hover:bg-red-700 p-2 px-4 rounded-3xl bg-red-400 text-white border-none outline-none cursor-pointer"
+              className="hover:bg-blue-400 p-2 px-4 rounded-3xl bg-blue-500 text-white border-none outline-none cursor-pointer"
             >
               Add
             </button>
@@ -95,7 +95,7 @@ export default function TaskManager() {
                 </span>
                 <button
                   onClick={() => deleteTask(index)} // Delete task on click
-                  className="p-1 px-2 text-xs bg-red-400 text-white rounded-full hover:bg-red-700"
+                  className="p-1 px-2 text-xs bg-blue-500 text-white rounded-full hover:bg-blue-400"
                 >
                   Delete
                 </button>
