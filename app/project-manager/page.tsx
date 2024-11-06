@@ -14,17 +14,20 @@ export default function PageComponent() {
     description: string;
     teamName: string;
     status: boolean;
+    tasks: number;
   }
 
 
   const projects: Project[] = [
-    { name: "Project A", description: "Description", teamName: "Team A", status: true },
-    { name: "Project B", description: "Description", teamName: "Team B", status: true },
+    { name: "Project A", description: "Description", teamName: "Team A", status: true, tasks:0},
+    { name: "Project B", description: "Description", teamName: "Team B", status: true, tasks:0},
   ];
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const totalTasks = projects.reduce((sum, project) => sum + project.tasks, 0)
 
   return (
     <>
@@ -44,9 +47,15 @@ export default function PageComponent() {
         </div>
         <div className="shadow-xl rounded-xl h-[20vh] w-[30vw] p-2 bg-white">
           Active Tasks
+          <div className="text-center text-7xl py-3">
+            {totalTasks}
+          </div>
+          <div>
+            
+          </div>
         </div>
         <div className="shadow-xl rounded-xl h-[20vh] w-[30vw] p-2 bg-white">
-          Completion Rate
+          Completion
         </div>
       </div>
       <div className="w-full flex justify-end px-2 m-2">
@@ -61,6 +70,7 @@ export default function PageComponent() {
             description={project.description}
             teamName={project.teamName}
             status={project.status}
+            tasks={0}
             />
           ))}
           </div>
