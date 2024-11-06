@@ -12,7 +12,6 @@ export default function TaskManager() {
   const [taskText, setTaskText] = useState(""); // State for input text
   const [tasks, setTasks] = useState<Task[]>([]); // State for task list
 
-<<<<<<< HEAD
   // Load tasks from localStorage when the component mounts
   useEffect(() => {
     const savedTasks = localStorage.getItem("tasks");
@@ -25,20 +24,6 @@ export default function TaskManager() {
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
-=======
-    // Load tasks from localStorage when the component mounts
-    useEffect(() => {
-      const savedTasks = localStorage.getItem("tasks");
-      if (savedTasks) {
-        setTasks(JSON.parse(savedTasks));
-      }
-    }, []);
-  
-    // Save tasks to localStorage whenever they change
-    useEffect(() => {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-    }, [tasks]);
->>>>>>> 224693cc00fee6a62ea93b2db580259aac373fa6
 
   const addTask = () => {
     if (taskText.trim() === "") {
@@ -62,11 +47,7 @@ export default function TaskManager() {
   const deleteTask = (index: number) => {
     setTasks((prevTasks) => [
       ...prevTasks.slice(0, index), // Elements before the index
-<<<<<<< HEAD
       ...prevTasks.slice(index + 1), // Elements after the index
-=======
-      ...prevTasks.slice(index + 1) // Elements after the index
->>>>>>> 224693cc00fee6a62ea93b2db580259aac373fa6
     ]);
   };
 
@@ -101,7 +82,6 @@ export default function TaskManager() {
             </button>
           </div>
           <ul className="py-2 pl-5 cursor-pointer list-disc">
-<<<<<<< HEAD
             {tasks.map((task, index) => (
               <li
                 key={index}
@@ -122,25 +102,6 @@ export default function TaskManager() {
               </li>
             ))}
           </ul>
-=======
-  {tasks.map((task, index) => (
-    <li key={index} className="pl-2 flex justify-between items-center hover:bg-gray-300 rounded-full">
-      <span
-        onClick={() => toggleTaskCompletion(index)} // Toggle completion on click
-        className={task.completed ? "line-through" : ""}
-      >
-        {task.text}
-      </span>
-      <button
-        onClick={() => deleteTask(index)} // Delete task on click
-        className="p-1 px-2 text-xs bg-red-400 text-white rounded-full hover:bg-red-700"
-      >
-        Delete
-      </button>
-    </li>
-  ))}
-</ul>
->>>>>>> 224693cc00fee6a62ea93b2db580259aac373fa6
         </div>
       </div>
     </>

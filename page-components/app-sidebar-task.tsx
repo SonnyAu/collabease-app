@@ -15,12 +15,12 @@ import {
 const items = [
   {
     title: "Dashboard",
-    url: "http://localhost:3000/dashboard",
+    url: "http://localhost:3000/project-manager",
     icon: LayoutDashboardIcon,
   },
   {
     title: "My Tasks",
-    url: "#",
+    url: "http://localhost:3000/task-manager",
     icon: GitGraph,
   },
   {
