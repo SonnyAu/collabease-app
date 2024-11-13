@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import ProjectCard from "@/page-components/ProjectCard";
+import ChatFeature from "@/page-components/ChatFeature";
 
 // Define the Project interface
 interface Project {
@@ -75,6 +76,9 @@ export default function PageComponent() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+      
+      <ChatFeature />
+
       <div className="shadow-xl h-[30vh] w-[100vw] bg-gradient-to-r from-sky-500 to-indigo-500 flex items-center space-x-3 overflow-x-auto">
         <div className="shadow-xl rounded-xl h-[20vh] w-[30vw] p-2 ml-2 bg-white">
           Projects
@@ -96,8 +100,10 @@ export default function PageComponent() {
           {filteredProjects.map((project, index) => (
             <ProjectCard key={index} project={project} />
           ))}
-        </div>
+        </div>       
       </div>
+
+      
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

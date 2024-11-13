@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
+import ChatFeature from "@/page-components/ChatFeature";
 
 interface Task {
   text: string;
@@ -63,7 +64,9 @@ export default function TaskManager() {
         </div>
       </div>
 
-      <div className="flex-none w-[100vw] h-screen bg-gradient-to-r from-sky-500 to-indigo-500 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
+      <ChatFeature />
+
+      <div className="flex-none w-[100vw] h-screen bg-gradient-to-r from-gray-200 to-gray-300 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
         <div className="bg-white w-[60vw] mx-auto mt-25 mb-auto pt-10 px-8 pb-10 rounded-xl flex-col">
           <h2 className="text-gray-400 mb-4 text-left">To-Do List</h2>
           <div className="w-[40vw] rounded-3xl bg-slate-200 text-left pl-4 justify-between items-center flex">
