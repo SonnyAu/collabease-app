@@ -5,9 +5,10 @@ import AuthForm from "@/page-components/auth/AuthForm";
 
 export default function HomePage() {
   return (
-    <div>
+    <div >
       {/* Header */}
-      <Header />
+      <div className="bg-blue-500"><Header /></div>
+      
 
       <main className="max-w-7xl mx-auto py-10 px-6 flex justify-between">
         {/* Welcome Text */}
