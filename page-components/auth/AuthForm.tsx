@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
 import { auth, googleProvider } from "@/lib/firebase";
-import { 
-  signInWithPopup, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  sendEmailVerification 
+import {
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
 } from "firebase/auth";
 
 export default function AuthForm() {
@@ -88,9 +88,9 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm">
+    <div className="bg-white shadow-4xl rounded-lg border border-gray-300 p-6 max-w-sm py-5">
       <h2 className="text-2xl font-bold mb-6">{isLogin ? "Log In" : "Register"}</h2>
-      
+
       {message && <p className="text-red-500 mb-4">{message}</p>}
 
       {verificationSent ? (
