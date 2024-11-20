@@ -1,8 +1,9 @@
-"use client"; // Keep this directive to ensure client-side rendering
+"use client";
 
 import Card from "@/page-components/Card";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { FiHome, FiBriefcase, FiList, FiFolder, FiLogOut } from "react-icons/fi";
 
 // Dynamically import FullCalendar for client-side rendering
 const FullCalendar = dynamic(() => import("@fullcalendar/react"), {
@@ -50,6 +51,53 @@ export default function HomePage() {
 
   return (
     <div className="w-screen min-h-screen flex">
+      {/* Sidebar */}
+      <div className="flex-none w-64 h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col py-6 px-4">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-blue-500">CollabEase</h1>
+          <p className="text-sm text-gray-400">Streamline your workflow</p>
+        </div>
+        <nav className="space-y-4 w-full">
+          <a
+            href="/home"
+            className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
+          >
+            <FiHome className="text-xl" />
+            <span>Home</span>
+          </a>
+          <a
+            href="/project-manager"
+            className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
+          >
+            <FiBriefcase className="text-xl" />
+            <span>Project Manager</span>
+          </a>
+          <a
+            href="/task-manager"
+            className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
+          >
+            <FiList className="text-xl" />
+            <span>Task Manager</span>
+          </a>
+          <a
+            href="/file-upload"
+            className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
+          >
+            <FiFolder className="text-xl" />
+            <span>Project Files</span>
+          </a>
+        </nav>
+        <div className="mt-auto w-full">
+          <a
+            href="/logout"
+            className="flex items-center gap-3 text-gray-700 hover:text-red-500 py-2 px-4 rounded-lg hover:bg-red-50"
+          >
+            <FiLogOut className="text-xl" />
+            <span>Logout</span>
+          </a>
+        </div>
+      </div>
+
       {/* Left container for cards */}
       <div className="flex-none w-[40vw] h-screen bg-gray-100 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
         {cards.map((_, index) => (
@@ -59,7 +107,6 @@ export default function HomePage() {
 
       {/* Right container with FullCalendar */}
       <div className="flex-grow ml-4 mr-4 h-[50vh] bg-gray-100 p-4 overflow-y-auto">
-        <h2 className="text-lg font-bold mb-4">Top Right Container</h2>
 
         {/* FullCalendar Component with event addition */}
         <FullCalendar
@@ -79,3 +126,4 @@ export default function HomePage() {
     </div>
   );
 }
+
