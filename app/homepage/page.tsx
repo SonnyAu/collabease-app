@@ -14,8 +14,13 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction"; // Enables event interaction
 
 export default function HomePage() {
-  // Example array representing the cards
-  const cards = [1, 2, 3, 4, 5, 6]; // Replace with your actual data
+  // Example task data
+  const tasks = [
+    { title: "Task 1", description: "Description 1", person: "Alice", status: "Done" },
+    { title: "Task 2", description: "Description 2", person: "Bob", status: "In Progress" },
+    { title: "Task 3", description: "Description 3", person: "Charlie", status: "Pending" },
+    { title: "Task 4", description: "Description 4", person: "Dana", status: "Done" },
+  ];
 
   // State to manage events
   const [events, setEvents] = useState([
@@ -59,7 +64,7 @@ export default function HomePage() {
         </div>
         <nav className="space-y-4 w-full">
           <a
-            href="/home"
+            href="/home-page"
             className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
           >
             <FiHome className="text-xl" />
@@ -98,16 +103,29 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Left container for cards */}
-      <div className="flex-none w-[40vw] h-screen bg-gray-100 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto">
-        {cards.map((_, index) => (
-          <Card key={index} />
-        ))}
+      {/* Left container for tasks */}
+      <div className="flex-none w-[40vw] h-screen bg-gray-100 p-6 overflow-y-auto">
+        {/* Header for the tasks section */}
+        <div className="sticky top-0 bg-gray-100 z-10 pb-2">
+          <h2 className="text-xl font-bold text-gray-700">Current Tasks</h2>
+        </div>
+
+        {/* Task Cards */}
+        <div className="space-y-4">
+          {tasks.map((task, index) => (
+            <Card
+              key={index}
+              title={task.title}
+              description={task.description}
+              person={task.person}
+              status={task.status}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Right container with FullCalendar */}
       <div className="flex-grow ml-4 mr-4 h-[50vh] bg-gray-100 p-4 overflow-y-auto">
-
         {/* FullCalendar Component with event addition */}
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -126,4 +144,3 @@ export default function HomePage() {
     </div>
   );
 }
-

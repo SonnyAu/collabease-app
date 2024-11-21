@@ -52,7 +52,7 @@ export default function UploadPage() {
         </div>
         <nav className="space-y-4 w-full">
           <a
-            href="/home"
+            href="/homepage"
             className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
           >
             <FiHome className="text-xl" />
@@ -73,7 +73,7 @@ export default function UploadPage() {
             <span>Task Manager</span>
           </a>
           <a
-            href="/project-files"
+            href="/file-upload"
             className="flex items-center gap-3 text-gray-700 hover:text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50"
           >
             <FiFolder className="text-xl" />
