@@ -2,40 +2,32 @@
 
 import React, { useState, useEffect } from "react";
 import { FiHome, FiBriefcase, FiList, FiFolder, FiLogOut } from "react-icons/fi";
-import ProjectCard from "@/page-components/task-manager/ProjectCard";
+import { useTasks } from "@/page-components/homepage/TaskContext";
 import ChatFeature from "@/page-components/task-manager/ChatFeature";
 
-// Define the Project interface
-interface Project {
-  name: string;
-  description: string;
-  teamName: string;
-  status: boolean; // false = in progress, true = completed
-  tasks: number;
-}
-
 export default function PageComponent() {
+  const { projects, tasks, addProject, updateProject, deleteProject } = useTasks();
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editProjectIndex, setEditProjectIndex] = useState<number | null>(null);
-  const [newProject, setNewProject] = useState<{ name: string; description: string; teamName: string; status: boolean }>({
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+
+  const [newProject, setNewProject] = useState<{
+    name: string;
+    description: string;
+    teamName: string;
+    status: boolean;
+  }>({
     name: "",
     description: "",
     teamName: "",
     status: false,
   });
 
-  const [projects, setProjects] = useState<Project[]>(() => {
-    try {
-      const savedProjects = localStorage.getItem("projects");
-      return savedProjects ? JSON.parse(savedProjects) : [];
-    } catch {
-      return [];
-    }
-  });
-
   useEffect(() => {
-    localStorage.setItem("projects", JSON.stringify(projects));
+    if (selectedProjectId === null && projects.length > 0) {
+      setSelectedProjectId(projects[0].id);
+    }
   }, [projects]);
 
   const handleOpenModal = (index: number | null = null) => {
@@ -73,27 +65,29 @@ export default function PageComponent() {
   const handleAddOrEditProject = (e: React.FormEvent) => {
     e.preventDefault();
     if (editProjectIndex !== null) {
-      setProjects((prevProjects) => {
-        const updatedProjects = [...prevProjects];
-        updatedProjects[editProjectIndex] = { ...updatedProjects[editProjectIndex], ...newProject };
-        return updatedProjects;
-      });
+      const updatedProject = { ...projects[editProjectIndex], ...newProject };
+      updateProject(updatedProject);
     } else {
-      const newProjectData: Project = { ...newProject, tasks: 0 };
-      setProjects((prevProjects) => [...prevProjects, newProjectData]);
+      const newProjectData = { ...newProject, id: Date.now() };
+      addProject(newProjectData);
     }
     handleCloseModal();
   };
 
-  const handleDeleteProject = (index: number) => {
-    setProjects((prevProjects) => prevProjects.filter((_, i) => i !== index));
+  const handleDeleteProject = (projectId: number) => {
+    deleteProject(projectId);
+    if (selectedProjectId === projectId) {
+      setSelectedProjectId(null);
+    }
   };
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalTasks = projects.reduce((sum, project) => sum + project.tasks, 0);
+  const tasksForSelectedProject = tasks.filter(
+    (task) => task.projectId === selectedProjectId
+  );
 
   return (
     <div className="w-screen min-h-screen flex">
@@ -146,46 +140,104 @@ export default function PageComponent() {
         {/* Chat Feature */}
         <ChatFeature />
 
-        {/* Statistics Section */}
+        {/* Stats Section */}
         <div className="grid grid-cols-3 gap-4 px-4 py-6 bg-gradient-to-r from-sky-500 to-indigo-500">
           <div className="shadow-xl rounded-xl h-[20vh] p-4 bg-white text-center">
             <h2 className="text-xl font-bold">Projects</h2>
             <p className="text-4xl mt-4">{projects.length}</p>
           </div>
           <div className="shadow-xl rounded-xl h-[20vh] p-4 bg-white text-center">
-            <h2 className="text-xl font-bold">Active Tasks</h2>
-            <p className="text-4xl mt-4">{totalTasks}</p>
+            <h2 className="text-xl font-bold">Tasks</h2>
+            <p className="text-4xl mt-4">{tasksForSelectedProject.length}</p>
           </div>
           <div className="shadow-xl rounded-xl h-[20vh] p-4 bg-white text-center">
             <h2 className="text-xl font-bold">Completion</h2>
-            <p className="text-4xl mt-4">{projects.filter((p) => p.status).length}</p>
+            <p className="text-4xl mt-4">
+              {
+                tasksForSelectedProject.filter((task) => task.status === "Done")
+                  .length
+              }
+            </p>
           </div>
         </div>
 
-        {/* Create Project Button */}
-        <div className="w-full flex justify-end px-2 m-2">
-          <button
-            onClick={() => handleOpenModal()}
-            className="bg-blue-500 px-2 text-white p-[4px] rounded-xl hover:bg-blue-400"
-          >
-            Create Project
-          </button>
+        {/* Projects Section */}
+        <div className="w-full px-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Projects</h2>
+            <button
+              className="bg-blue-500 px-4 py-2 text-white rounded hover:bg-blue-400"
+              onClick={() => handleOpenModal()}
+            >
+              Add Project
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {filteredProjects.map((project, index) => (
+              <div
+                key={project.id}
+                className={`cursor-pointer shadow-md p-4 rounded-md ${
+                  selectedProjectId === project.id ? "bg-blue-100" : "bg-white"
+                } border hover:shadow-lg`}
+                onClick={() => setSelectedProjectId(project.id)}
+              >
+                <h3 className="text-lg font-semibold">{project.name}</h3>
+                <p className="text-sm">{project.description}</p>
+                <p className="text-xs text-gray-500">Team: {project.teamName}</p>
+                <p className="text-xs text-gray-500">
+                  Status: {project.status ? "Completed" : "In Progress"}
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    className="text-blue-500 hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenModal(index);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-500 hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Projects Display */}
-        <div className="mx-6 my-4 p-4 bg-blue-50 rounded-lg shadow-md grid grid-cols-1 gap-4">
-          {filteredProjects.map((project, index) => (
-            <ProjectCard
-              key={index}
-              project={project}
-              onDelete={() => handleDeleteProject(index)}
-              onEdit={() => handleOpenModal(index)}
-            />
-          ))}
-        </div>
+        {/* Tasks Section */}
+        {selectedProjectId && (
+          <div className="w-full px-4 mt-6">
+            <h2 className="text-2xl font-bold mb-4">
+              Tasks for Selected Project
+            </h2>
+            <ul className="list-group">
+              {tasksForSelectedProject.map((task) => (
+                <li
+                  key={task.id}
+                  className="list-group-item p-4 mb-2 border rounded shadow-md hover:shadow-lg"
+                >
+                  <h4 className="font-semibold text-lg">{task.title}</h4>
+                  <p className="text-sm text-gray-600">{task.description}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Status: {task.status} | Due: {task.dueDate || "N/A"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      {/* Modal for Adding/Editing Projects */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] max-w-md">
@@ -193,63 +245,71 @@ export default function PageComponent() {
               {editProjectIndex !== null ? "Edit Project" : "Add New Project"}
             </h3>
             <form onSubmit={handleAddOrEditProject}>
-              <div>
-                <h4 className="text-lg">Project Name</h4>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Project Name
+                </label>
                 <input
                   type="text"
-                  placeholder="Add Project Name"
                   name="name"
                   value={newProject.name}
-                  className="border rounded-lg px-2 w-full py-2 text-slate-900 bg-slate-200 mb-4"
                   onChange={handleInputChange}
+                  className="w-full px-2 py-1 border rounded"
                   required
                 />
               </div>
-              <div>
-                <h4 className="text-lg">Project Description</h4>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Project Description
+                </label>
                 <input
                   type="text"
-                  placeholder="Add Project Description"
                   name="description"
                   value={newProject.description}
-                  className="border rounded-lg px-2 w-full py-2 text-slate-900 bg-slate-200 mb-4"
                   onChange={handleInputChange}
+                  className="w-full px-2 py-1 border rounded"
                   required
                 />
               </div>
-              <div>
-                <h4 className="text-lg">Team Name</h4>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Team Name
+                </label>
                 <input
                   type="text"
-                  placeholder="Add Team Name"
                   name="teamName"
                   value={newProject.teamName}
-                  className="border rounded-lg px-2 w-full py-2 text-slate-900 bg-slate-200 mb-4"
                   onChange={handleInputChange}
+                  className="w-full px-2 py-1 border rounded"
                   required
                 />
               </div>
-              <div>
-                <h4 className="text-lg">Project Status</h4>
-                <label className="flex items-center gap-2">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div>
                   <input
                     type="checkbox"
                     checked={newProject.status}
                     onChange={handleCheckboxChange}
                   />
-                  <span>{newProject.status ? "Completed" : "In Progress"}</span>
-                </label>
+                  <span className="ml-2">
+                    {newProject.status ? "Completed" : "In Progress"}
+                  </span>
+                </div>
               </div>
-              <div className="flex mt-3 space-x-2 justify-end">
+              <div className="flex justify-end space-x-2">
                 <button
-                  className="border rounded-lg py-1 px-2 bg-blue-500 hover:bg-blue-400 text-white"
+                  type="button"
                   onClick={handleCloseModal}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400"
                 >
                   Cancel
                 </button>
                 <button
-                  className="border rounded-lg py-1 px-2 bg-blue-500 hover:bg-blue-400 text-white"
                   type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400"
                 >
                   {editProjectIndex !== null ? "Save Changes" : "Add Project"}
                 </button>

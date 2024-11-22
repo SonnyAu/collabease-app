@@ -12,10 +12,16 @@ interface Task {
   status: "To-Do" | "In-Process" | "Done";
   assignedTo: string;
   dueDate: string;
+  projectId: number | null;
+}
+
+interface Project {
+  id: number;
+  name: string;
 }
 
 export default function TaskManager() {
-  const { tasks, addTask, updateTask, deleteTask } = useTasks();
+  const { tasks, addTask, updateTask, deleteTask, projects } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -40,7 +46,6 @@ export default function TaskManager() {
 
   return (
     <div className="d-flex">
-      {/* Sidebar */}
       <div className="flex-none w-64 h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col py-6 px-4">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-blue-500">CollabEase</h1>
@@ -72,7 +77,6 @@ export default function TaskManager() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-grow p-4">
         <div className="d-flex justify-content-between mb-4">
           <h2>Tasks</h2>
@@ -91,6 +95,10 @@ export default function TaskManager() {
                 <p className="mb-1 text-muted">{task.description}</p>
                 <small className="d-block">Assigned to: {task.assignedTo}</small>
                 <small className="d-block">Due Date: {task.dueDate}</small>
+                <small className="d-block">
+                  Project:{" "}
+                  {projects.find((project) => project.id === task.projectId)?.name || "None"}
+                </small>
               </div>
               <div>
                 <button
@@ -111,12 +119,12 @@ export default function TaskManager() {
         </ul>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <TaskModal
           task={editingTask}
           onClose={closeModal}
           onSubmit={handleTaskSubmit}
+          projects={projects}
         />
       )}
     </div>
@@ -127,14 +135,16 @@ interface TaskModalProps {
   task: Task | null;
   onClose: () => void;
   onSubmit: (task: Task) => void;
+  projects: Project[];
 }
 
-function TaskModal({ task, onClose, onSubmit }: TaskModalProps) {
+function TaskModal({ task, onClose, onSubmit, projects }: TaskModalProps) {
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [status, setStatus] = useState<Task["status"]>(task?.status || "To-Do");
   const [assignedTo, setAssignedTo] = useState(task?.assignedTo || "");
   const [dueDate, setDueDate] = useState(task?.dueDate || "");
+  const [projectId, setProjectId] = useState<number | null>(task?.projectId || null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +155,7 @@ function TaskModal({ task, onClose, onSubmit }: TaskModalProps) {
       status,
       assignedTo,
       dueDate,
+      projectId,
     };
     onSubmit(newTask);
   };
@@ -210,6 +221,23 @@ function TaskModal({ task, onClose, onSubmit }: TaskModalProps) {
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                 />
+              </div>
+              <div className="form-group">
+                <label>Project</label>
+                <select
+                  className="form-control"
+                  value={projectId || ""}
+                  onChange={(e) =>
+                    setProjectId(e.target.value ? Number(e.target.value) : null)
+                  }
+                >
+                  <option value="">None</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button type="submit" className="btn btn-primary mt-3">
                 Save Task
