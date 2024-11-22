@@ -38,7 +38,7 @@ const ChatFeature: React.FC = () => {
       {/* Chat Window */}
       {isChatOpen && (
         <div className="fixed bottom-16 right-4 w-80 bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
-          <div className="h-64 overflow-y-auto mb-4">
+          <div className="max-h-[60vh] overflow-y-scroll mb-4">
             {/* Display messages */}
             {messages.map((msg, index) => (
               <div key={index} className="mb-2">

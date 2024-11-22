@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import ProjectCard from "@/page-components/ProjectCard";
 import ChatFeature from "@/page-components/ChatFeature";
 
+
 // Define the Project interface
 interface Project {
   name: string;
@@ -20,7 +21,7 @@ export default function PageComponent() {
   // State for controlling modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // State for controlling user input for the new project form
+  // State for new project input
   const [newProject, setNewProject] = useState<{ name: string; description: string; teamName: string }>({
     name: "",
     description: "",
@@ -33,35 +34,48 @@ export default function PageComponent() {
     return savedProjects ? JSON.parse(savedProjects) : [];
   });
 
-  // Function to handle open modal
-  const handleOpenModal = () => setIsModalOpen(true);
+  // Listen for changes in localStorage to sync projects across components
+  useEffect(() => {
+    const syncProjects = (event: StorageEvent) => {
+      if (event.key === "projects") {
+        setProjects(event.newValue ? JSON.parse(event.newValue) : []);
+      }
+    };
 
-  // Function to handle closed modal
+    window.addEventListener("storage", syncProjects);
+    return () => window.removeEventListener("storage", syncProjects);
+  }, []);
+
+  // Save projects to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("projects", JSON.stringify(projects));
+  }, [projects]);
+
+  // Handle modal open/close
+  const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // Function to handle input changes (name is flexible across all input fields)
+  // Handle input changes for the form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewProject((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
+  // Add a new project
   const handleAddProject = (e: React.FormEvent) => {
     e.preventDefault();
-    const newProjectData: Project = { ...newProject, tasks: 0, status: false }; // Create new project based on data
-    setProjects((prevProjects) => {
-      const updatedProjects = [...prevProjects, newProjectData]; // Add the new project
-      localStorage.setItem("projects", JSON.stringify(updatedProjects)); // Save updated projects to localStorage
-      return updatedProjects;
-    });
-    setNewProject({ name: "", description: "", teamName: "" }); // Clear form
+    const newProjectData: Project = { ...newProject, tasks: 0, status: false }; // Create a new project
+    setProjects((prevProjects) => [...prevProjects, newProjectData]); // Add to state
+    setNewProject({ name: "", description: "", teamName: "" }); // Reset form
     handleCloseModal(); // Close modal
   };
 
+  // Filter projects based on search query
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Calculate total tasks across projects
   const totalTasks = projects.reduce((sum, project) => sum + project.tasks, 0);
 
   return (
@@ -76,7 +90,7 @@ export default function PageComponent() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-      
+
       <ChatFeature />
 
       <div className="shadow-xl h-[30vh] w-[100vw] bg-gradient-to-r from-sky-500 to-indigo-500 flex items-center space-x-3 overflow-x-auto">

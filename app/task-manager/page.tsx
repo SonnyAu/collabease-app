@@ -4,36 +4,41 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import ChatFeature from "@/page-components/ChatFeature";
 
+
 interface Task {
   text: string;
   completed: boolean;
 }
 
 export default function TaskManager() {
-  const [taskText, setTaskText] = useState(""); // State for input text
-  const [tasks, setTasks] = useState<Task[]>([]); // State for task list
-
-  // Load tasks from localStorage when the component mounts
-  useEffect(() => {
+  const [taskText, setTaskText] = useState("");
+  const [tasks, setTasks] = useState<Task[]>(() => {
     const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    }
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+
+  // Sync tasks when localStorage changes
+  useEffect(() => {
+    const syncTasks = (event: StorageEvent) => {
+      if (event.key === "tasks") {
+        setTasks(event.newValue ? JSON.parse(event.newValue) : []);
+      }
+    };
+
+    window.addEventListener("storage", syncTasks);
+    return () => window.removeEventListener("storage", syncTasks);
   }, []);
 
-  // Save tasks to localStorage whenever they change
+  // Update localStorage when tasks change
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
   const addTask = () => {
-    if (taskText.trim() === "") {
-      alert("Empty task cannot be added!");
-    } else {
-      // Add new task to the list
-      setTasks([...tasks, { text: taskText, completed: false }]);
-      setTaskText(""); // Clear the input after adding
-    }
+    if (taskText.trim() === "") return;
+    const newTask = { text: taskText, completed: false };
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setTaskText("");
   };
 
   const toggleTaskCompletion = (index: number) => {
