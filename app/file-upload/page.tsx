@@ -21,14 +21,8 @@ export default function UploadPage() {
     const files = event.target.files;
     if (files) {
       const newFiles: UploadedFile[] = Array.from(files).map((file) => {
-        // Check if the file is an image
         const isImage = file.type.startsWith("image/");
-        let preview = null;
-
-        // If it's an image, create a URL for it
-        if (isImage) {
-          preview = URL.createObjectURL(file);
-        }
+        const preview = isImage ? URL.createObjectURL(file) : null;
 
         return { file, preview };
       });
@@ -37,9 +31,15 @@ export default function UploadPage() {
     }
   };
 
-  // Handle file deletion
   const handleDeleteFile = (index: number) => {
-    setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setUploadedFiles((prevFiles) => {
+      const fileToDelete = prevFiles[index];
+      if (fileToDelete.preview) {
+        // Revoke the object URL when deleting the file
+        URL.revokeObjectURL(fileToDelete.preview);
+      }
+      return prevFiles.filter((_, i) => i !== index);
+    });
   };
 
   return (
@@ -103,7 +103,7 @@ export default function UploadPage() {
           />
         </div>
 
-        {/* Display Uploaded Files in a Grid */}
+        {/* Display Uploaded Files */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {uploadedFiles.map((uploadedFile, index) => (
             <div
@@ -120,14 +120,12 @@ export default function UploadPage() {
               </button>
 
               {uploadedFile.preview ? (
-                // Display image preview if it's an image file
                 <img
                   src={uploadedFile.preview}
                   alt={uploadedFile.file.name}
                   className="w-full h-32 object-cover mb-2 rounded"
                 />
               ) : (
-                // Display file icon or name if it's not an image
                 <div className="w-full h-32 flex items-center justify-center bg-gray-200 mb-2 rounded">
                   <span className="text-sm text-gray-500">
                     {uploadedFile.file.name}
@@ -135,7 +133,6 @@ export default function UploadPage() {
                 </div>
               )}
 
-              {/* File name and size */}
               <div className="text-sm font-medium text-gray-700 truncate w-full text-center">
                 {uploadedFile.file.name}
               </div>

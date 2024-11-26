@@ -36,22 +36,32 @@ const TaskContext = createContext<TaskContextProps | undefined>(undefined);
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  const [projects, setProjects] = useState<Project[]>(() => {
-    const savedProjects = localStorage.getItem("projects");
-    return savedProjects ? JSON.parse(savedProjects) : [];
-  });
-
+  // Load tasks and projects from localStorage on mount
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    if (typeof window !== "undefined") {
+      const savedTasks = localStorage.getItem("tasks");
+      const savedProjects = localStorage.getItem("projects");
+
+      setTasks(savedTasks ? JSON.parse(savedTasks) : []);
+      setProjects(savedProjects ? JSON.parse(savedProjects) : []);
+    }
+  }, []);
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
   }, [tasks]);
 
+  // Save projects to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("projects", JSON.stringify(projects));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("projects", JSON.stringify(projects));
+    }
   }, [projects]);
 
   const addTask = (task: Task) => setTasks((prev) => [...prev, task]);
